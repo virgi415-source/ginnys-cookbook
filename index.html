@@ -82,6 +82,11 @@
     width: 52px; height: 52px; border-radius: 12px; background: var(--paper-dark);
     display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
+  .card-media {
+    margin: -20px -20px 0; aspect-ratio: 16 / 10; border-radius: 16px 16px 0 0;
+    overflow: hidden; background: var(--paper-dark);
+  }
+  .card-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
   .card-title { font-family: 'Fraunces', Georgia, serif; font-weight: 700; font-size: 19px; line-height: 1.25; }
   .card-tagline { font-size: 13.5px; color: var(--ink-soft); margin-top: 5px; line-height: 1.45; }
   .card-meta { font-size: 12px; font-weight: 600; margin-top: auto; }
@@ -99,6 +104,13 @@
     width: 60px; height: 60px; border-radius: 14px; background: var(--paper-dark);
     display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
+  .detail-media { margin: 18px 0 0; }
+  .detail-media img {
+    width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 16px; display: block;
+    background: var(--paper-dark);
+  }
+  .img-credit { font-size: 11px; color: var(--ink-soft); margin: 6px 2px 0; text-align: right; }
+  .img-credit a { color: inherit; }
   h2.detail-title {
     font-family: 'Fraunces', Georgia, serif; font-weight: 700;
     font-size: clamp(24px, 5vw, 30px); margin: 0; line-height: 1.2;
@@ -218,7 +230,7 @@
   }
 
   @media print {
-    .toolbar, .back, .searchbar, .count, footer.foot { display: none !important; }
+    .toolbar, .back, .searchbar, .count, footer.foot, .img-credit { display: none !important; }
     body { background: #fff; }
   }
 </style>

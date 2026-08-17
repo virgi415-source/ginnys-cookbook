@@ -125,7 +125,11 @@ function renderList() {
     .map(
       (r) => `
       <button class="card" data-open="${esc(r.id)}">
-        <span class="badge">${icon(r.icon, 32)}</span>
+        ${
+          r.image
+            ? `<div class="card-media"><img src="${esc(r.image)}" alt="" loading="lazy" decoding="async" /></div>`
+            : `<span class="badge">${icon(r.icon, 32)}</span>`
+        }
         <span>
           <span class="card-title" style="display:block">${esc(r.title)}</span>
           <span class="card-tagline" style="display:block">${esc(r.tagline)}</span>
@@ -197,6 +201,19 @@ function renderDetail(r) {
   app.innerHTML = `
     <div class="detail">
       <button class="back" data-back>← All recipes</button>
+
+      ${
+        r.image
+          ? `<figure class="detail-media">
+               <img src="${esc(r.image)}" alt="${esc(r.title)}" loading="lazy" decoding="async" />
+               ${
+                 r.imageCredit
+                   ? `<figcaption class="img-credit">Photo: <a href="https://unsplash.com/@${esc(r.imageCredit.username)}?utm_source=ginnys-cookbook&utm_medium=referral" target="_blank" rel="noopener noreferrer">${esc(r.imageCredit.name)}</a> / <a href="https://unsplash.com/?utm_source=ginnys-cookbook&utm_medium=referral" target="_blank" rel="noopener noreferrer">Unsplash</a></figcaption>`
+                   : ""
+               }
+             </figure>`
+          : ""
+      }
 
       <div class="detail-head">
         <div class="detail-badge">${icon(r.icon, 38)}</div>

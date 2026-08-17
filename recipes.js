@@ -12,6 +12,8 @@
      baseServings  number the amounts below are written for
      sourceUrl     (optional) reference link
      allergens     (optional) string, e.g. "Milk · Eggs · Wheat"
+     image         (optional) sample photo URL shown on the card + detail page
+     imageCredit   (optional) { name, username } — Unsplash photographer credit
      ingredients   [{ id, amount, unit, name }]
      steps         [{ id, title, content, timer }]  timer = seconds or null
      notes         (optional) free text
@@ -37,6 +39,8 @@ const RECIPES = [
     icon: "watermelon",
     accent: PALETTE.brick,
     baseServings: 9,
+    image: "https://images.unsplash.com/photo-1626303551646-69dbd1ab24be?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDE3MjIwfDB8MXxzZWFyY2h8MXx8d2F0ZXJtZWxvbiUyMGZldGElMjBzYWxhZHxlbnwwfDB8fHwxNzg2OTM0MDMyfDI&ixlib=rb-4.1.0&q=80&w=1080",
+    imageCredit: { name: "Anto Meneghini", username: "antomeneghini" },
     ingredients: [
       { id: "i1", amount: 2.5, unit: "kg", name: "seedless watermelon, cubed" },
       { id: "i2", amount: 2, unit: "", name: "English cucumbers, thinly sliced" },
@@ -64,6 +68,8 @@ const RECIPES = [
     icon: "paneer",
     accent: PALETTE.basil,
     baseServings: 9,
+    image: "https://images.unsplash.com/photo-1608032077018-c9aad9565d29?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDE3MjIwfDB8MXxzZWFyY2h8MXx8Z3JpbGxlZCUyMHBhbmVlciUyMHNhbGFkfGVufDB8MHx8fDE3ODY5MzQwMzN8Mg&ixlib=rb-4.1.0&q=80&w=1080",
+    imageCredit: { name: "Christine Isakzhanova", username: "bulochka" },
     ingredients: [
       { id: "i1", amount: 500, unit: "g", name: "paneer, cubed" },
       { id: "i2", amount: 2, unit: "cup", name: "chickpeas, drained and rinsed" },
@@ -98,6 +104,8 @@ const RECIPES = [
     accent: PALETTE.mustard,
     baseServings: 12,
     sourceUrl: "https://youtu.be/3-3LOFvH4GE",
+    image: "https://images.unsplash.com/photo-1741244133042-970251e76066?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDE3MjIwfDB8MXxzZWFyY2h8M3x8cGVhY2glMjBsYXllciUyMGNha2UlMjBkZXNzZXJ0fGVufDB8MHx8fDE3ODY5MzQwMzN8Mg&ixlib=rb-4.1.0&q=80&w=1080",
+    imageCredit: { name: "Brett Wharton", username: "brettwharton" },
     ingredients: [
       { id: "i1", amount: 2, unit: "", name: "packages ladyfingers (Savoiardi), about 24 total" },
       { id: "i2", amount: 2, unit: "cans", name: "canned peach halves (29 oz), well drained, juice reserved" },
@@ -130,6 +138,8 @@ const RECIPES = [
     icon: "blank",
     accent: PALETTE.brick,
     baseServings: 2,
+    image: "https://images.unsplash.com/photo-1600688654899-379ec76aca42?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDE3MjIwfDB8MXxzZWFyY2h8MXx8ZnJpZWQlMjBlZ2clMjByaWNlJTIwYm93bHxlbnwwfDB8fHwxNzg2OTM0MDM0fDI&ixlib=rb-4.1.0&q=80&w=1080",
+    imageCredit: { name: "Emanuel Ekström", username: "emanuelekstrom" },
     ingredients: [
       { id: "i1", amount: 8, unit: "oz", name: "paneer, cubed" },
       { id: "i2", amount: 2, unit: "tbsp", name: "neutral oil" },
@@ -161,6 +171,8 @@ const RECIPES = [
     icon: "jar",
     accent: PALETTE.basil,
     baseServings: 6,
+    image: "https://images.unsplash.com/photo-1519623286359-e9f3cbef015b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDE3MjIwfDB8MXxzZWFyY2h8Mnx8YnV0dGVybWlsayUyMGRyZXNzaW5nJTIwaGVyYnMlMjBqYXJ8ZW58MHwwfHx8MTc4NjkzNDA3Nnwy&ixlib=rb-4.1.0&q=80&w=1080",
+    imageCredit: { name: "Caroline Attwood", username: "_carolineattwood" },
     ingredients: [
       { id: "i1", amount: 0.75, unit: "cup", name: "buttermilk" },
       { id: "i2", amount: 0.5, unit: "cup", name: "mayonnaise" },
@@ -191,6 +203,8 @@ const RECIPES = [
     accent: PALETTE.mustard,
     baseServings: 2,
     allergens: "Milk · Eggs · Wheat",
+    image: "https://images.unsplash.com/photo-1767114915965-7abe87d7c7d8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDE3MjIwfDB8MXxzZWFyY2h8MXx8YnJvY2NvbGklMjBmcml0dGVyc3xlbnwwfDB8fHwxNzg2OTM0MDM2fDI&ixlib=rb-4.1.0&q=80&w=1080",
+    imageCredit: { name: "Chetanya Sharma", username: "chetanya_designs" },
     ingredients: [
       { id: "i1", amount: 8, unit: "oz", name: "broccoli, florets and stalks minced" },
       { id: "i2", amount: 0.5, unit: "cup", name: "cheddar cheese, shredded" },
@@ -225,6 +239,8 @@ const RECIPES = [
     icon: "spice",
     accent: PALETTE.brick,
     baseServings: 6,
+    image: "https://images.unsplash.com/photo-1625921133217-8d978f7872b8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDE3MjIwfDB8MXxzZWFyY2h8MXx8cGFwcmlrYSUyMHNwaWNlJTIwYmxlbmR8ZW58MHwwfHx8MTc4NjkzNDAzNnwy&ixlib=rb-4.1.0&q=80&w=1080",
+    imageCredit: { name: "Towfiqu barbhuiya", username: "towfiqu999999" },
     ingredients: [
       { id: "i1", amount: 2, unit: "tbsp", name: "smoked paprika" },
       { id: "i2", amount: 2, unit: "tbsp", name: "garlic powder" },
@@ -248,6 +264,8 @@ const RECIPES = [
     icon: "dijonjar",
     accent: PALETTE.mustard,
     baseServings: 6,
+    image: "https://images.unsplash.com/photo-1638324396220-432156cd9303?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDE3MjIwfDB8MXxzZWFyY2h8MXx8aG9uZXklMjBtdXN0YXJkJTIwZHJlc3Npbmd8ZW58MHwwfHx8MTc4NjkzNDAzNnwy&ixlib=rb-4.1.0&q=80&w=1080",
+    imageCredit: { name: "Addilyn Ragsdill", username: "clockwork_lemon" },
     ingredients: [
       { id: "i1", amount: 0.25, unit: "cup", name: "Dijon mustard" },
       { id: "i2", amount: 0.25, unit: "cup", name: "honey" },
@@ -272,6 +290,8 @@ const RECIPES = [
     accent: PALETTE.brick,
     baseServings: 1,
     allergens: "Fish · Milk · Wheat",
+    image: "https://images.unsplash.com/photo-1693820206774-d4a769355142?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDE3MjIwfDB8MXxzZWFyY2h8MXx8c3BhZ2hldHRpJTIwYWdsaW8lMjBvbGlvJTIwZ2FybGljJTIwcGFzdGF8ZW58MHwwfHx8MTc4NjkzNDAzN3wy&ixlib=rb-4.1.0&q=80&w=1080",
+    imageCredit: { name: "Imad 786", username: "imad8321" },
     ingredients: [
       { id: "i1", amount: 80, unit: "g", name: "spaghetti" },
       { id: "i2", amount: 56, unit: "g", name: "Crown Prince flat anchovies (whole tin)" },
