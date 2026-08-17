@@ -110,8 +110,7 @@ const RECIPES = [
     accent: PALETTE.mustard,
     baseServings: 12,
     sourceUrl: "https://youtu.be/3-3LOFvH4GE",
-    image: "https://images.unsplash.com/photo-1741244133042-970251e76066?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDE3MjIwfDB8MXxzZWFyY2h8M3x8cGVhY2glMjBsYXllciUyMGNha2UlMjBkZXNzZXJ0fGVufDB8MHx8fDE3ODY5MzQwMzN8Mg&ixlib=rb-4.1.0&q=80&w=1080",
-    imageCredit: { name: "Brett Wharton", username: "brettwharton" },
+    image: "images/peach-eierlikortorte.jpg",
     ingredients: [
       { id: "i1", amount: 2, unit: "", name: "packages ladyfingers (Savoiardi), about 24 total" },
       { id: "i2", amount: 2, unit: "cans", name: "canned peach halves (29 oz), well drained, juice reserved" },
@@ -179,8 +178,8 @@ const RECIPES = [
     icon: "jar",
     accent: PALETTE.basil,
     baseServings: 6,
-    image: "https://images.unsplash.com/photo-1519623286359-e9f3cbef015b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDE3MjIwfDB8MXxzZWFyY2h8Mnx8YnV0dGVybWlsayUyMGRyZXNzaW5nJTIwaGVyYnMlMjBqYXJ8ZW58MHwwfHx8MTc4NjkzNDA3Nnwy&ixlib=rb-4.1.0&q=80&w=1080",
-    imageCredit: { name: "Caroline Attwood", username: "_carolineattwood" },
+    image: "https://images.unsplash.com/photo-1780037382703-c13d292aaf7d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDE3MjIwfDB8MXxzZWFyY2h8MXx8cmFuY2glMjBkcmVzc2luZyUyMGJvd2x8ZW58MHwwfHx8MTc4NjkzNDA1N3wy&ixlib=rb-4.1.0&q=80&w=1080",
+    imageCredit: { name: "Allen Y", username: "yanahd" },
     ingredients: [
       { id: "i1", amount: 0.75, unit: "cup", name: "buttermilk" },
       { id: "i2", amount: 0.5, unit: "cup", name: "mayonnaise" },

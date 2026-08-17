@@ -97,6 +97,7 @@ const state = {
   openId: null,
   servings: null,
   query: "",
+  category: null, // null = All
   cooking: null, // { stepIndex, secondsLeft, running }
 };
 
@@ -111,7 +112,7 @@ function findRecipe(id) {
 /* ---------- Views ---------- */
 function renderList() {
   const q = state.query.trim().toLowerCase();
-  const matches = !q
+  const searched = !q
     ? RECIPES
     : RECIPES.filter((r) => {
         const hay = [
@@ -120,6 +121,16 @@ function renderList() {
         ].join(" ").toLowerCase();
         return hay.includes(q);
       });
+  const matches = state.category ? searched.filter((r) => r.category === state.category) : searched;
+
+  const tabs = ["All", ...CATEGORIES]
+    .map((cat) => {
+      const count = cat === "All" ? searched.length : searched.filter((r) => r.category === cat).length;
+      if (cat !== "All" && count === 0) return "";
+      const active = cat === "All" ? !state.category : state.category === cat;
+      return `<button class="tab${active ? " active" : ""}" data-tab="${esc(cat)}">${esc(cat)} <span class="tab-count">${count}</span></button>`;
+    })
+    .join("");
 
   const cardHtml = (r) => `
       <button class="card" data-open="${esc(r.id)}">
@@ -137,21 +148,28 @@ function renderList() {
         </span>
       </button>`;
 
-  const groups = CATEGORIES
-    .map((cat) => ({ cat, items: matches.filter((r) => r.category === cat) }))
-    .filter((g) => g.items.length);
-  const uncategorized = matches.filter((r) => !CATEGORIES.includes(r.category));
-  if (uncategorized.length) groups.push({ cat: "Other", items: uncategorized });
+  let body;
+  if (!matches.length) {
+    body = `<p class="empty">No recipes match “${esc(state.query)}”.</p>`;
+  } else if (state.category) {
+    body = `<div class="grid">${matches.map(cardHtml).join("")}</div>`;
+  } else {
+    const groups = CATEGORIES
+      .map((cat) => ({ cat, items: matches.filter((r) => r.category === cat) }))
+      .filter((g) => g.items.length);
+    const uncategorized = matches.filter((r) => !CATEGORIES.includes(r.category));
+    if (uncategorized.length) groups.push({ cat: "Other", items: uncategorized });
 
-  const sections = groups
-    .map(
-      ({ cat, items }) => `
-      <section class="category">
-        <h2 class="category-title">${esc(cat)} <span class="category-count">${items.length}</span></h2>
-        <div class="grid">${items.map(cardHtml).join("")}</div>
-      </section>`
-    )
-    .join("");
+    body = groups
+      .map(
+        ({ cat, items }) => `
+        <section class="category">
+          <h2 class="category-title">${esc(cat)} <span class="category-count">${items.length}</span></h2>
+          <div class="grid">${items.map(cardHtml).join("")}</div>
+        </section>`
+      )
+      .join("");
+  }
 
   app.innerHTML = `
     <header class="masthead">
@@ -167,9 +185,10 @@ function renderList() {
       <input id="search" type="search" placeholder="Search recipes or ingredients…"
              value="${esc(state.query)}" aria-label="Search recipes" />
     </div>
+    <div class="tabs">${tabs}</div>
     <div class="count">${matches.length} of ${RECIPES.length} recipe${RECIPES.length === 1 ? "" : "s"}</div>
 
-    ${matches.length ? sections : `<p class="empty">No recipes match “${esc(state.query)}”.</p>`}
+    ${body}
 
     <footer class="foot">Updated whenever a new recipe is added. Tap any card for ingredients, scaling, and step-by-step cooking mode.</footer>
   `;
@@ -365,6 +384,14 @@ document.addEventListener("click", (e) => {
     return;
   }
   if (e.target.closest("[data-back]")) { location.hash = ""; return; }
+
+  const tabBtn = e.target.closest("[data-tab]");
+  if (tabBtn) {
+    const val = tabBtn.getAttribute("data-tab");
+    state.category = val === "All" ? null : val;
+    renderList();
+    return;
+  }
 
   const servBtn = e.target.closest("[data-serv]");
   if (servBtn) {
