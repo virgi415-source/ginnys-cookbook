@@ -121,9 +121,7 @@ function renderList() {
         return hay.includes(q);
       });
 
-  const cards = matches
-    .map(
-      (r) => `
+  const cardHtml = (r) => `
       <button class="card" data-open="${esc(r.id)}">
         ${
           r.image
@@ -137,7 +135,21 @@ function renderList() {
         <span class="card-meta" style="color:${esc(r.accent)}">
           ${r.ingredients.length} ingredients · ${r.steps.length} steps
         </span>
-      </button>`
+      </button>`;
+
+  const groups = CATEGORIES
+    .map((cat) => ({ cat, items: matches.filter((r) => r.category === cat) }))
+    .filter((g) => g.items.length);
+  const uncategorized = matches.filter((r) => !CATEGORIES.includes(r.category));
+  if (uncategorized.length) groups.push({ cat: "Other", items: uncategorized });
+
+  const sections = groups
+    .map(
+      ({ cat, items }) => `
+      <section class="category">
+        <h2 class="category-title">${esc(cat)} <span class="category-count">${items.length}</span></h2>
+        <div class="grid">${items.map(cardHtml).join("")}</div>
+      </section>`
     )
     .join("");
 
@@ -157,7 +169,7 @@ function renderList() {
     </div>
     <div class="count">${matches.length} of ${RECIPES.length} recipe${RECIPES.length === 1 ? "" : "s"}</div>
 
-    ${matches.length ? `<div class="grid">${cards}</div>` : `<p class="empty">No recipes match “${esc(state.query)}”.</p>`}
+    ${matches.length ? sections : `<p class="empty">No recipes match “${esc(state.query)}”.</p>`}
 
     <footer class="foot">Updated whenever a new recipe is added. Tap any card for ingredients, scaling, and step-by-step cooking mode.</footer>
   `;

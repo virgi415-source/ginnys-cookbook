@@ -6,6 +6,7 @@
      id            unique kebab-case string
      title         recipe name
      tagline       one-line description
+     category      one of the strings in CATEGORIES below
      icon          one of: watermelon, paneer, cake, blank, jar,
                    fritter, spice, dijonjar
      accent        PALETTE.brick | PALETTE.basil | PALETTE.mustard
@@ -18,6 +19,8 @@
      steps         [{ id, title, content, timer }]  timer = seconds or null
      notes         (optional) free text
    ========================================================= */
+
+const CATEGORIES = ["Salads", "Mains", "Dressings & Sauces", "Seasonings", "Desserts"];
 
 const PALETTE = {
   paper: "#F7F3EA",
@@ -36,6 +39,7 @@ const RECIPES = [
     id: "watermelon-feta-mint",
     title: "Watermelon Feta Mint Salad",
     tagline: "Cool, sweet-salty, and built for a 100° afternoon.",
+    category: "Salads",
     icon: "watermelon",
     accent: PALETTE.brick,
     baseServings: 9,
@@ -65,6 +69,7 @@ const RECIPES = [
     id: "paneer-chickpea",
     title: "Crispy Paneer Chickpea Salad",
     tagline: "Griddled paneer, lemon-cumin dressing, built to share the grill.",
+    category: "Salads",
     icon: "paneer",
     accent: PALETTE.basil,
     baseServings: 9,
@@ -100,6 +105,7 @@ const RECIPES = [
     id: "peach-eierlikortorte",
     title: "No-Bake Peach Eierlikörtorte",
     tagline: "German ladyfinger torte, peach & mascarpone cream, no oven needed.",
+    category: "Desserts",
     icon: "cake",
     accent: PALETTE.mustard,
     baseServings: 12,
@@ -135,6 +141,7 @@ const RECIPES = [
     id: "paneer-kimchi-egg-bowl",
     title: "Crispy Paneer & Kimchi Fried Egg Bowl",
     tagline: "Golden seared paneer, garlicky kimchi, and a crispy fried egg over a bright herb salad.",
+    category: "Mains",
     icon: "blank",
     accent: PALETTE.brick,
     baseServings: 2,
@@ -168,6 +175,7 @@ const RECIPES = [
     id: "fresh-herb-ranch",
     title: "Fresh Herb Ranch Dressing",
     tagline: "Buttermilk ranch thinned out with minced fresh dill, chives & parsley.",
+    category: "Dressings & Sauces",
     icon: "jar",
     accent: PALETTE.basil,
     baseServings: 6,
@@ -199,6 +207,7 @@ const RECIPES = [
     id: "broccoli-cheddar-fritters",
     title: "Crispy Broccoli Cheddar Fritters with Ranch Salad",
     tagline: "Golden fried fritters, honey Dijon for dipping, ranch salad with pickled shallot on the side.",
+    category: "Mains",
     icon: "fritter",
     accent: PALETTE.mustard,
     baseServings: 2,
@@ -236,6 +245,7 @@ const RECIPES = [
     id: "fry-seasoning",
     title: "Fry Seasoning (Copycat Blend)",
     tagline: "Smoky paprika-garlic-onion blend for fries, roasted veg, and fritters.",
+    category: "Seasonings",
     icon: "spice",
     accent: PALETTE.brick,
     baseServings: 6,
@@ -261,6 +271,7 @@ const RECIPES = [
     id: "honey-dijon-dressing",
     title: "Honey Dijon Dressing",
     tagline: "Whisked mustard-honey vinaigrette, ready in five minutes.",
+    category: "Dressings & Sauces",
     icon: "dijonjar",
     accent: PALETTE.mustard,
     baseServings: 6,
@@ -286,6 +297,7 @@ const RECIPES = [
     id: "spaghetti-aglio-olio-anchovy-chili",
     title: "Spaghetti Aglio e Olio with Anchovies & Fresno Chili",
     tagline: "A bold Italian classic with melted anchovies, golden garlic, and fruity Fresno heat.",
+    category: "Mains",
     icon: "blank",
     accent: PALETTE.brick,
     baseServings: 1,
