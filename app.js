@@ -65,15 +65,20 @@ function esc(str) {
   );
 }
 
-const FRACS = { 0.25: "¼", 0.5: "½", 0.75: "¾" };
+const FRACS = { 0.125: "⅛", 0.25: "¼", 0.375: "⅜", 0.5: "½", 0.625: "⅝", 0.75: "¾", 0.875: "⅞" };
 
 function scaleAmount(amount, base, servings) {
   const val = (amount / base) * servings;
   if (Math.abs(val - Math.round(val)) < 0.01) return String(Math.round(val));
-  const rounded = Math.round(val * 4) / 4;
+  let rounded = Math.round(val * 4) / 4;
+  // A small amount can round all the way down to 0 on a quarter grid (e.g. scaling
+  // a 9-serving recipe's 1/2 tsp down to 1 serving) — retry on an eighths grid, and
+  // fall back to two decimals rather than showing a misleading "0".
+  if (rounded === 0) rounded = Math.round(val * 8) / 8;
+  if (rounded === 0) return val.toFixed(2);
   if (Number.isInteger(rounded)) return String(rounded);
   const whole = Math.floor(rounded);
-  const frac = Math.round((rounded - whole) * 100) / 100;
+  const frac = Math.round((rounded - whole) * 1000) / 1000;
   const fracStr = FRACS[frac] || rounded.toFixed(2);
   return whole > 0 ? `${whole}${fracStr}` : fracStr;
 }
@@ -455,7 +460,7 @@ function syncFromHash() {
   state.cooking = null;
   if (r) {
     state.openId = r.id;
-    state.servings = r.baseServings;
+    state.servings = 1;
     document.title = r.title + " — My Cookbook";
   } else {
     state.openId = null;
