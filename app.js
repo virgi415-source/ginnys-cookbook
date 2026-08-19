@@ -67,20 +67,51 @@ function esc(str) {
 
 const FRACS = { 0.125: "⅛", 0.25: "¼", 0.375: "⅜", 0.5: "½", 0.625: "⅝", 0.75: "¾", 0.875: "⅞" };
 
-function scaleAmount(amount, base, servings) {
-  const val = (amount / base) * servings;
+// Unit ladders for stepping down to a smaller, still-standard kitchen unit
+// when an amount is too small to express cleanly in the unit it was written in.
+const UNIT_STEPS = {
+  cup: [{ factor: 16, unit: "tbsp" }, { factor: 3, unit: "tsp" }],
+  tbsp: [{ factor: 3, unit: "tsp" }],
+  kg: [{ factor: 1000, unit: "g" }],
+};
+
+// Formats a raw quantity as a whole number or a nice fraction (quarters, then
+// eighths). Returns null when even eighths round to 0 — signal to the caller
+// that this unit can't express the amount and a smaller one should be tried.
+function formatNiceFraction(val) {
   if (Math.abs(val - Math.round(val)) < 0.01) return String(Math.round(val));
   let rounded = Math.round(val * 4) / 4;
-  // A small amount can round all the way down to 0 on a quarter grid (e.g. scaling
-  // a 9-serving recipe's 1/2 tsp down to 1 serving) — retry on an eighths grid, and
-  // fall back to two decimals rather than showing a misleading "0".
   if (rounded === 0) rounded = Math.round(val * 8) / 8;
-  if (rounded === 0) return val.toFixed(2);
+  if (rounded === 0) return null;
   if (Number.isInteger(rounded)) return String(rounded);
   const whole = Math.floor(rounded);
   const frac = Math.round((rounded - whole) * 1000) / 1000;
-  const fracStr = FRACS[frac] || rounded.toFixed(2);
+  const fracStr = FRACS[frac];
+  if (!fracStr) return null;
   return whole > 0 ? `${whole}${fracStr}` : fracStr;
+}
+
+// Scales an ingredient amount and, only if the amount can't be shown cleanly
+// in its original unit (e.g. 0.06 cup), steps down to a smaller standard unit
+// (cup → tbsp → tsp, kg → g) until it can. Returns { text, unit } — unit may
+// differ from the one passed in.
+function scaleQuantity(amount, base, servings, unit) {
+  let val = (amount / base) * servings;
+  let displayUnit = unit;
+  let text = formatNiceFraction(val);
+  const steps = UNIT_STEPS[unit];
+  if (text === null && steps) {
+    for (const step of steps) {
+      val *= step.factor;
+      displayUnit = step.unit;
+      text = formatNiceFraction(val);
+      if (text !== null) break;
+    }
+  }
+  // Nothing worked (e.g. a fraction of a whole onion, or already at the
+  // smallest unit) — floor at an eighth rather than show a raw decimal.
+  if (text === null) text = FRACS[0.125];
+  return { text, unit: displayUnit };
 }
 
 function fmtTime(s) {
@@ -212,12 +243,13 @@ function renderList() {
 function renderDetail(r) {
   const servings = state.servings;
   const ings = r.ingredients
-    .map(
-      (i) => `<li>
-        <span class="amt" style="color:${esc(r.accent)}">${esc(scaleAmount(i.amount, r.baseServings, servings))} ${esc(i.unit)}</span>
+    .map((i) => {
+      const q = scaleQuantity(i.amount, r.baseServings, servings, i.unit);
+      return `<li>
+        <span class="amt" style="color:${esc(r.accent)}">${esc(q.text)} ${esc(q.unit)}</span>
         <span>${esc(i.name)}</span>
-      </li>`
-    )
+      </li>`;
+    })
     .join("");
 
   const steps = r.steps
@@ -263,11 +295,15 @@ function renderDetail(r) {
 
       <div class="toolbar">
         <div class="servings">
-          <span class="servings-label">SERVINGS</span>
-          <button class="circle" data-serv="-" aria-label="Decrease servings">−</button>
-          <span class="servings-num">${servings}</span>
-          <button class="circle" data-serv="+" aria-label="Increase servings">+</button>
-          ${servings !== r.baseServings ? `<button class="reset" data-serv="reset">reset</button>` : ""}
+          ${
+            r.scalable === false
+              ? `<span class="servings-label">MAKES</span><span class="servings-num">${r.baseServings}</span>`
+              : `<span class="servings-label">SERVINGS</span>
+                 <button class="circle" data-serv="-" aria-label="Decrease servings">−</button>
+                 <span class="servings-num">${servings}</span>
+                 <button class="circle" data-serv="+" aria-label="Increase servings">+</button>
+                 ${servings !== r.baseServings ? `<button class="reset" data-serv="reset">reset</button>` : ""}`
+          }
         </div>
         <button class="cook-btn" data-cook style="background:${esc(r.accent)}">Start cooking mode →</button>
       </div>
@@ -460,7 +496,7 @@ function syncFromHash() {
   state.cooking = null;
   if (r) {
     state.openId = r.id;
-    state.servings = 1;
+    state.servings = r.scalable === false ? r.baseServings : 1;
     document.title = r.title + " — My Cookbook";
   } else {
     state.openId = null;

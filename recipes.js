@@ -10,7 +10,12 @@
      icon          one of: watermelon, paneer, cake, blank, jar,
                    fritter, spice, dijonjar
      accent        PALETTE.brick | PALETTE.basil | PALETTE.mustard
-     baseServings  number the amounts below are written for
+     baseServings  number the amounts below are written for (or the
+                   total yield, when scalable is false)
+     scalable      (optional) set to false for a yield/batch recipe
+                   (a whole cake, a jar of dressing, a spice blend) —
+                   hides the servings stepper and shows a plain
+                   "MAKES {baseServings}" label instead
      sourceUrl     (optional) reference link
      allergens     (optional) string, e.g. "Milk · Eggs · Wheat"
      image         (optional) sample photo URL shown on the card + detail page
@@ -109,6 +114,7 @@ const RECIPES = [
     icon: "cake",
     accent: PALETTE.mustard,
     baseServings: 12,
+    scalable: false,
     sourceUrl: "https://youtu.be/3-3LOFvH4GE",
     image: "images/peach-eierlikortorte.jpg",
     ingredients: [
@@ -178,6 +184,7 @@ const RECIPES = [
     icon: "jar",
     accent: PALETTE.basil,
     baseServings: 6,
+    scalable: false,
     image: "https://images.unsplash.com/photo-1780037382703-c13d292aaf7d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDE3MjIwfDB8MXxzZWFyY2h8MXx8cmFuY2glMjBkcmVzc2luZyUyMGJvd2x8ZW58MHwwfHx8MTc4NjkzNDA1N3wy&ixlib=rb-4.1.0&q=80&w=1080",
     imageCredit: { name: "Allen Y", username: "yanahd" },
     ingredients: [
@@ -248,6 +255,7 @@ const RECIPES = [
     icon: "spice",
     accent: PALETTE.brick,
     baseServings: 6,
+    scalable: false,
     image: "https://images.unsplash.com/photo-1625921133217-8d978f7872b8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDE3MjIwfDB8MXxzZWFyY2h8MXx8cGFwcmlrYSUyMHNwaWNlJTIwYmxlbmR8ZW58MHwwfHx8MTc4NjkzNDAzNnwy&ixlib=rb-4.1.0&q=80&w=1080",
     imageCredit: { name: "Towfiqu barbhuiya", username: "towfiqu999999" },
     ingredients: [
@@ -274,6 +282,7 @@ const RECIPES = [
     icon: "dijonjar",
     accent: PALETTE.mustard,
     baseServings: 6,
+    scalable: false,
     image: "https://images.unsplash.com/photo-1638324396220-432156cd9303?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDE3MjIwfDB8MXxzZWFyY2h8MXx8aG9uZXklMjBtdXN0YXJkJTIwZHJlc3Npbmd8ZW58MHwwfHx8MTc4NjkzNDAzNnwy&ixlib=rb-4.1.0&q=80&w=1080",
     imageCredit: { name: "Addilyn Ragsdill", username: "clockwork_lemon" },
     ingredients: [
