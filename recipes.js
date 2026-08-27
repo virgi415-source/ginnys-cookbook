@@ -443,6 +443,7 @@ const RECIPES = [
       { id: "s8", title: "Whip the meringue", content: "After 25 minutes of baking, beat the 4 egg whites with a pinch of salt. Once foamy, slowly stream in the remaining 200 g sugar and beat until stiff, glossy peaks form — about 5 minutes total.", timer: 300 },
       { id: "s9", title: "Top with meringue", content: "Once the 30 minutes is up, remove the cake from the oven and spread the meringue on top using two spoons, leaving a border of about 1.5 cm — the meringue expands as it bakes and shouldn't touch the pan sides. Use the spoons to create a wave pattern or peaks.", timer: null },
       { id: "s10", title: "Second bake", content: "Bake again for 25–30 minutes on the lowest rack (important!) at 175°C (350°F) top/bottom heat. The meringue should turn a light beige — watch closely near the end so it doesn't get too dark or scorch.", timer: 1800 },
+      { id: "s11", title: "Cool & release", content: "Remove the cake from the oven and let it cool halfway on a wire rack. Then release the springform and let the cake cool completely.", timer: null },
     ],
     notes: "Bake on the lowest oven rack both times so the meringue doesn't over-brown before it's fully set. Watch the last few minutes closely — the meringue should be light beige, never dark or blackened. Adapted from Oma's original recipe via Malte's Kitchen.",
   },
