@@ -242,6 +242,8 @@ function renderList() {
 
 function renderDetail(r) {
   const servings = state.servings;
+  const isVideoSource = r.sourceUrl && /youtu\.?be/i.test(r.sourceUrl);
+  const sourceLabel = isVideoSource ? "▶ Watch reference video" : "View original recipe →";
   const ings = r.ingredients
     .map((i) => {
       const q = scaleQuantity(i.amount, r.baseServings, servings, i.unit);
@@ -289,7 +291,7 @@ function renderDetail(r) {
           <h2 class="detail-title">${esc(r.title)}</h2>
           <p class="detail-tagline">${esc(r.tagline)}</p>
           ${r.allergens ? `<p class="allergens">Allergens: ${esc(r.allergens)}</p>` : ""}
-          ${r.sourceUrl ? `<a class="source-link" href="${esc(r.sourceUrl)}" target="_blank" rel="noopener noreferrer">▶ Watch reference video</a>` : ""}
+          ${r.sourceUrl ? `<a class="source-link" href="${esc(r.sourceUrl)}" target="_blank" rel="noopener noreferrer">${sourceLabel}</a>` : ""}
         </div>
       </div>
 
