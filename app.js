@@ -75,13 +75,15 @@ const UNIT_STEPS = {
   kg: [{ factor: 1000, unit: "g" }],
 };
 
-// Formats a raw quantity as a whole number or a nice fraction (quarters, then
-// eighths). Returns null when even eighths round to 0 — signal to the caller
-// that this unit can't express the amount and a smaller one should be tried.
+// Formats a raw quantity as a whole number or a nice eighths fraction.
+// Rounds straight to the nearest eighth (which already covers quarters and
+// halves exactly) rather than snapping to quarters first — a quarter-first
+// pass can round an exact eighth like 0.125 up to 1/4, doubling it. Returns
+// null when eighths round to 0 — signal to the caller that this unit can't
+// express the amount and a smaller one should be tried.
 function formatNiceFraction(val) {
   if (Math.abs(val - Math.round(val)) < 0.01) return String(Math.round(val));
-  let rounded = Math.round(val * 4) / 4;
-  if (rounded === 0) rounded = Math.round(val * 8) / 8;
+  const rounded = Math.round(val * 8) / 8;
   if (rounded === 0) return null;
   if (Number.isInteger(rounded)) return String(rounded);
   const whole = Math.floor(rounded);
