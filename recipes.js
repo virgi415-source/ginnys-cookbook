@@ -414,8 +414,7 @@ const RECIPES = [
     scalable: false,
     allergens: "Milk · Eggs · Wheat",
     sourceUrl: "https://www.malteskitchen.de/rhabarberkuchen-baiser-oma/",
-    image: "https://images.unsplash.com/photo-1623596627064-bbd32c626478?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDE3MjIwfDB8MXxzZWFyY2h8NHx8cmh1YmFyYiUyMGNha2UlMjBtZXJpbmd1ZXxlbnwwfDB8fHwxNzg3Nzk0NzEzfDI&ixlib=rb-4.1.0&q=80&w=1080",
-    imageCredit: { name: "Maximilian Zahn", username: "_iammax" },
+    image: "images/oma-rhabarberkuchen-baiser.jpg",
     ingredients: [
       { id: "i1", amount: 500, unit: "g", name: "rhubarb, cut into ~1 cm pieces" },
       { id: "i2", amount: 2, unit: "tbsp", name: "sugar (for the rhubarb)" },
