@@ -52,6 +52,14 @@ const ICONS = {
     <path d="M15 18 h20 a3 3 0 0 1 3 3 v27 a4 4 0 0 1 -4 4 h-18 a4 4 0 0 1 -4 -4 v-27 a3 3 0 0 1 3 -3 Z" fill="#F1E4B8" stroke="#D2A03D" stroke-width="1.5"/>
     <path d="M13 30 h26 v18 a4 4 0 0 1 -4 4 h-18 a4 4 0 0 1 -4 -4 Z" fill="#D2A03D"/>
     <path d="M13 30 h26 v5 h-26 Z" fill="#E8B94F"/></svg>`,
+  bread: (s) => `<svg width="${s}" height="${s}" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+    <ellipse cx="32" cy="38" rx="24" ry="16" fill="#B4472F"/>
+    <ellipse cx="32" cy="36" rx="24" ry="16" fill="#D2A03D"/>
+    <path d="M17 26 Q24 20 32 26" stroke="#8A5A1E" stroke-width="1.6" fill="none"/>
+    <path d="M32 24 Q40 18 47 26" stroke="#8A5A1E" stroke-width="1.6" fill="none"/>
+    <circle cx="20" cy="36" r="1.3" fill="#F1E4B8"/><circle cx="27" cy="41" r="1.3" fill="#F1E4B8"/>
+    <circle cx="35" cy="37" r="1.3" fill="#F1E4B8"/><circle cx="42" cy="42" r="1.3" fill="#F1E4B8"/>
+    <circle cx="24" cy="46" r="1.3" fill="#F1E4B8"/><circle cx="38" cy="46" r="1.3" fill="#F1E4B8"/></svg>`,
 };
 
 function icon(name, size) {

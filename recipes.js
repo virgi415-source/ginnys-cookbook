@@ -8,7 +8,7 @@
      tagline       one-line description
      category      one of the strings in CATEGORIES below
      icon          one of: watermelon, paneer, cake, blank, jar,
-                   fritter, spice, dijonjar
+                   fritter, spice, dijonjar, bread
      accent        PALETTE.brick | PALETTE.basil | PALETTE.mustard
      baseServings  number the amounts below are written for (or the
                    total yield, when scalable is false)
@@ -25,7 +25,7 @@
      notes         (optional) free text
    ========================================================= */
 
-const CATEGORIES = ["Salads", "Mains", "Dressings & Sauces", "Seasonings", "Desserts"];
+const CATEGORIES = ["Salads", "Mains", "Breads", "Dressings & Sauces", "Seasonings", "Desserts"];
 
 const PALETTE = {
   paper: "#F7F3EA",
@@ -513,5 +513,41 @@ const RECIPES = [
       { id: "s5", title: "Assemble", content: "Toss the 1½ cups arugula with a little vinaigrette and plate. Top with the roasted beets, 1½ oz feta, and toasted walnuts. Drizzle the remaining vinaigrette over top.", timer: null },
     ],
     notes: "Golden beets won't stain like red ones do, so this is a good one to make ahead. Roast the beets a day early and store cubed in the fridge to cut down on day-of time. Swap walnuts for pistachios or pecans if you'd rather.",
+  },
+  {
+    id: "seeded-sourdough-loaf",
+    title: "Seeded Sourdough Loaf",
+    tagline: "A German-style boule loaded with toasted pumpkin and sunflower seeds, rolled in sesame before baking. Needs an active, bubbly starter.",
+    category: "Breads",
+    icon: "bread",
+    accent: PALETTE.brick,
+    baseServings: 12,
+    scalable: false,
+    allergens: "Wheat · Sesame",
+    image: "https://images.unsplash.com/photo-1627308593341-d886acdc06a2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3wxMDE3MjIwfDB8MXxzZWFyY2h8MXx8c2VzYW1lJTIwc2VlZCUyMGNydXN0ZWQlMjBzb3VyZG91Z2glMjBicmVhZHxlbnwwfDB8fHwxNzg4ODA1NTcyfDI&ixlib=rb-4.1.0&q=80&w=1080",
+    imageCredit: { name: "Vicky Ng", username: "vickyng" },
+    ingredients: [
+      { id: "i1", amount: 100, unit: "g", name: "active sourdough starter, bubbly and doubled" },
+      { id: "i2", amount: 350, unit: "g", name: "water, room temperature" },
+      { id: "i3", amount: 500, unit: "g", name: "bread flour" },
+      { id: "i4", amount: 10, unit: "g", name: "fine sea salt" },
+      { id: "i5", amount: 60, unit: "g", name: "pumpkin seeds (pepitas)" },
+      { id: "i6", amount: 60, unit: "g", name: "raw sunflower seeds" },
+      { id: "i7", amount: 15, unit: "g", name: "sesame seeds, for coating the crust" },
+    ],
+    steps: [
+      { id: "s1", title: "Toast the seeds", content: "Toast the pumpkin and sunflower seeds in a dry skillet over medium heat, stirring often, until fragrant and lightly golden. Cool completely.", timer: null },
+      { id: "s2", title: "Autolyse", content: "Combine the 500 g bread flour and 350 g water, room temperature in a large bowl and mix until no dry flour remains. Cover and rest.", timer: null },
+      { id: "s3", title: "Mix in starter and salt", content: "Add the 100 g active sourdough starter and 10 g fine sea salt to the rested dough. Squeeze and fold in the bowl until fully incorporated and no streaks remain.", timer: null },
+      { id: "s4", title: "Bulk ferment with folds", content: "Over the next 2 hours, perform 4 sets of stretch-and-folds at 30-minute intervals: wet your hand, pull one side of the dough up and over, rotate the bowl, repeat on all sides. Fold the toasted pumpkin and sunflower seeds in during the second set.", timer: 7200 },
+      { id: "s5", title: "Finish bulk rise", content: "Let the dough continue rising at room temperature, undisturbed, until puffy and increased by about 50%.", timer: null },
+      { id: "s6", title: "Shape and coat", content: "Turn the dough onto a lightly floured surface and shape into a tight boule. Mist the surface with water and roll it in the sesame seeds to coat. Place seam-side up in a floured banneton or bowl lined with a floured towel.", timer: null },
+      { id: "s7", title: "Cold retard overnight", content: "Cover and refrigerate overnight. This develops flavor and makes the loaf easier to score.", timer: null },
+      { id: "s8", title: "Preheat", content: "Place a Dutch oven (with lid) in the oven and preheat to 475°F (245°C).", timer: null },
+      { id: "s9", title: "Score and bake covered", content: "Turn the cold dough out onto parchment, score the top with a sharp blade, and lower it into the hot Dutch oven. Cover and bake.", timer: null },
+      { id: "s10", title: "Bake uncovered", content: "Remove the lid and continue baking until the crust is deep golden brown.", timer: null },
+      { id: "s11", title: "Cool completely", content: "Transfer the loaf to a wire rack and let it cool fully before slicing — the crumb is still setting as it cools.", timer: null },
+    ],
+    notes: "Makes 1 loaf, about 12 slices. If your starter is sluggish, feed it 4-6 hours before you plan to mix. No banneton? A round bowl lined with a well-floured kitchen towel works fine. Bulk fermentation time will run faster in a warm kitchen and slower in a cool one — go by the 50% rise, not the clock.",
   },
 ];
