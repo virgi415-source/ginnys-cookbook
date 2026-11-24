@@ -250,6 +250,21 @@ function renderList() {
   });
 }
 
+function fmtMinutes(m) {
+  if (m < 60) return `${m} min`;
+  const h = Math.floor(m / 60), r = m % 60;
+  return r ? `${h} hr ${r} min` : `${h} hr`;
+}
+
+function timesHtml(r) {
+  const parts = [];
+  if (r.prepTime != null) parts.push(`Prep ${fmtMinutes(r.prepTime)}`);
+  if (r.cookTime > 0) parts.push(`Cook ${fmtMinutes(r.cookTime)}`);
+  if (r.prepTime != null && r.cookTime > 0) parts.push(`Total ${fmtMinutes(r.prepTime + r.cookTime)}`);
+  if (r.waitTime > 0) parts.push(`${r.waitLabel || "Rest"} ${fmtMinutes(r.waitTime)}`);
+  return parts.length ? `<p class="times">${esc(parts.join(" · "))}</p>` : "";
+}
+
 function renderDetail(r) {
   const servings = state.servings;
   const isVideoSource = r.sourceUrl && /youtu\.?be/i.test(r.sourceUrl);
@@ -300,6 +315,7 @@ function renderDetail(r) {
         <div>
           <h2 class="detail-title">${esc(r.title)}</h2>
           <p class="detail-tagline">${esc(r.tagline)}</p>
+          ${timesHtml(r)}
           ${r.allergens ? `<p class="allergens">Allergens: ${esc(r.allergens)}</p>` : ""}
           ${r.sourceUrl ? `<a class="source-link" href="${esc(r.sourceUrl)}" target="_blank" rel="noopener noreferrer">${sourceLabel}</a>` : ""}
         </div>
