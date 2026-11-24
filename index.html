@@ -54,20 +54,30 @@
   .subtitle { color: var(--ink-soft); font-size: 15px; max-width: 480px; margin: 0; line-height: 1.5; }
 
   /* ---------- Search ---------- */
-  .searchbar { position: relative; margin: 22px 0 26px; }
+  /* Sticky bar: search + category chips (list view) or back/cook (recipe view) */
+  .navbar {
+    position: sticky; top: 0; z-index: 20; margin: 0 -20px 6px;
+    padding: max(10px, env(safe-area-inset-top)) 20px 4px;
+    background: var(--paper); box-shadow: 0 1px 0 var(--line);
+  }
+  .searchbar { position: relative; margin: 0 0 10px; }
   .searchbar input {
     width: 100%; padding: 12px 16px 12px 40px; border-radius: 24px;
     border: 1px solid var(--line); background: var(--card); color: var(--ink);
-    font-family: inherit; font-size: 15px; outline: none;
+    font-family: inherit; font-size: 16px; outline: none; /* 16px stops iOS zooming on focus */
+    -webkit-appearance: none; appearance: none;
   }
   .searchbar input:focus { border-color: var(--basil); box-shadow: 0 0 0 3px rgba(75,106,69,0.12); }
   .searchbar svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); opacity: 0.5; }
-  .count { font-size: 12.5px; color: var(--ink-soft); margin: -14px 0 18px 4px; }
+  .count { font-size: 12.5px; color: var(--ink-soft); margin: 10px 0 14px 4px; }
+  .link-btn { font: inherit; color: var(--brick); background: none; border: none; text-decoration: underline; cursor: pointer; padding: 0; }
 
   /* ---------- Category tabs ---------- */
   .tabs {
-    display: flex; gap: 8px; overflow-x: auto; padding: 2px 2px 10px; margin: 0 0 4px;
-    scrollbar-width: none;
+    position: relative; display: flex; gap: 8px; overflow-x: auto; padding: 2px 32px 8px 20px; margin: 0 -20px;
+    scrollbar-width: none; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain;
+    -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+            mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
   }
   .tabs::-webkit-scrollbar { display: none; }
   .tab {
@@ -84,6 +94,7 @@
   /* ---------- Categories & cards ---------- */
   .category { margin-top: 32px; }
   .category:first-of-type { margin-top: 4px; }
+  .category, #results { scroll-margin-top: 120px; }
   .category-title {
     font-family: 'Fraunces', Georgia, serif; font-weight: 700; font-size: 18px;
     margin: 0 0 14px; display: flex; align-items: baseline; gap: 8px; color: var(--ink);
@@ -120,10 +131,12 @@
 
   /* ---------- Detail ---------- */
   .detail { max-width: 720px; margin: 0 auto; }
+  .detail-nav { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 6px; margin-bottom: 0; }
   .back {
-    background: none; border: none; font: inherit; font-size: 14px;
-    color: var(--ink-soft); cursor: pointer; padding: 6px 0;
+    background: none; border: none; font: inherit; font-size: 15px; font-weight: 600;
+    color: var(--ink-soft); cursor: pointer; padding: 10px 4px; min-height: 44px;
   }
+  .cook-mini { padding: 8px 16px; font-size: 13px; }
   .back:hover { color: var(--ink); }
   .detail-head { display: flex; align-items: flex-start; gap: 16px; margin-top: 18px; }
   .detail-badge {
@@ -256,8 +269,28 @@
     font-size: 12.5px; color: var(--ink-soft);
   }
 
+  /* Phones & touch screens: bigger tap targets, tighter header */
+  @media (pointer: coarse) {
+    .tab { min-height: 40px; padding: 8px 16px; }
+    .circle { width: 40px; height: 40px; font-size: 20px; }
+    .cook-btn { min-height: 44px; }
+    .cook-mini { min-height: 40px; }
+    .exit-btn { padding: 10px 16px; }
+    .reset { padding: 10px 6px; }
+  }
+  @media (max-width: 600px) {
+    .wrap { padding-top: 22px; }
+    header.masthead { margin-bottom: 14px; }
+    .subtitle { display: none; }
+    .grid { grid-template-columns: 1fr; gap: 12px; }
+    .card { padding: 16px; }
+    .card-media { margin: -16px -16px 0; }
+    .detail-head { gap: 12px; }
+    .toolbar { position: static; }
+  }
+
   @media print {
-    .toolbar, .back, .searchbar, .count, footer.foot, .img-credit { display: none !important; }
+    .navbar, .toolbar, .back, .searchbar, .count, footer.foot, .img-credit { display: none !important; }
     body { background: #fff; }
   }
 </style>

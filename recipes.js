@@ -25,7 +25,7 @@
      notes         (optional) free text
    ========================================================= */
 
-const CATEGORIES = ["Salads", "Mains", "Breads", "Dressings & Sauces", "Seasonings", "Desserts"];
+const CATEGORIES = ["Soups", "Salads", "Mains", "Sides", "Breads", "Desserts", "Dressings & Sauces", "Seasonings"];
 
 const PALETTE = {
   paper: "#F7F3EA",
@@ -596,6 +596,7 @@ const RECIPES = [
     id: "potato-leek-soup",
     title: "Potato Leek Soup",
     tagline: "Silky, buttery, and comforting. Just leeks, potato, and a splash of cream.",
+    category: "Soups",
     icon: "blank",
     accent: PALETTE.basil,
     baseServings: 1,
@@ -629,6 +630,7 @@ const RECIPES = [
     id: "green-bean-casserole",
     title: "Green Bean Casserole",
     tagline: "From-scratch mushroom cream sauce, tender green beans, and crispy homemade onions.",
+    category: "Sides",
     icon: "blank",
     accent: PALETTE.mustard,
     baseServings: 6,

@@ -144,6 +144,7 @@ const state = {
   servings: null,
   query: "",
   category: null, // null = All
+  listScroll: 0, // list scroll position, restored when coming back from a recipe
   cooking: null, // { stepIndex, secondsLeft, running }
 };
 
@@ -196,7 +197,7 @@ function renderList() {
 
   let body;
   if (!matches.length) {
-    body = `<p class="empty">No recipes match “${esc(state.query)}”.</p>`;
+    body = `<p class="empty">No recipes match${state.query ? ` “${esc(state.query)}”` : ""}${state.category ? ` in ${esc(state.category)}` : ""}. <button class="link-btn" data-clear>Show all recipes</button></p>`;
   } else if (state.category) {
     body = `<div class="grid">${matches.map(cardHtml).join("")}</div>`;
   } else {
@@ -217,6 +218,9 @@ function renderList() {
       .join("");
   }
 
+  const prevTabs = app.querySelector(".tabs");
+  const prevLeft = prevTabs ? prevTabs.scrollLeft : null;
+
   app.innerHTML = `
     <header class="masthead">
       <div class="eyebrow">A growing collection</div>
@@ -224,20 +228,38 @@ function renderList() {
       <p class="subtitle">Every recipe you approve gets added here, ready with adjustable servings and a guided cooking mode.</p>
     </header>
 
-    <div class="searchbar">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B6355" stroke-width="2" aria-hidden="true">
-        <circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/>
-      </svg>
-      <input id="search" type="search" placeholder="Search recipes or ingredients…"
-             value="${esc(state.query)}" aria-label="Search recipes" />
+    <div class="navbar">
+      <div class="searchbar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5B6355" stroke-width="2" aria-hidden="true">
+          <circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/>
+        </svg>
+        <input id="search" type="search" placeholder="Search recipes or ingredients…"
+               value="${esc(state.query)}" aria-label="Search recipes"
+               enterkeyhint="search" autocomplete="off" autocapitalize="off" />
+      </div>
+      <div class="tabs" role="group" aria-label="Recipe categories">${tabs}</div>
     </div>
-    <div class="tabs">${tabs}</div>
     <div class="count">${matches.length} of ${RECIPES.length} recipe${RECIPES.length === 1 ? "" : "s"}</div>
 
-    ${body}
+    <div id="results">${body}</div>
 
     <footer class="foot">Updated whenever a new recipe is added. Tap any card for ingredients, scaling, and step-by-step cooking mode.</footer>
   `;
+
+  // Keep the category chips where the user left them, and make sure the active one is visible.
+  const tabsEl = app.querySelector(".tabs");
+  const activeTab = tabsEl && tabsEl.querySelector(".tab.active");
+  if (tabsEl) {
+    if (prevLeft != null) {
+      tabsEl.scrollLeft = prevLeft; // same list view re-rendering (typing, tapping a chip): don't move the strip
+    } else if (activeTab) {
+      // arriving at the list: centre the active chip if it would be off-screen
+      const left = activeTab.offsetLeft, right = left + activeTab.offsetWidth;
+      if (left < tabsEl.scrollLeft || right > tabsEl.scrollLeft + tabsEl.clientWidth) {
+        tabsEl.scrollLeft = left - (tabsEl.clientWidth - activeTab.offsetWidth) / 2;
+      }
+    }
+  }
 
   const input = document.getElementById("search");
   input.addEventListener("input", (e) => {
@@ -294,8 +316,11 @@ function renderDetail(r) {
     .join("");
 
   app.innerHTML = `
+    <div class="navbar detail-nav">
+      <button class="back" data-back>← ${esc(state.category || "All recipes")}</button>
+      <button class="cook-btn cook-mini" data-cook style="background:${esc(r.accent)}">Cook →</button>
+    </div>
     <div class="detail">
-      <button class="back" data-back>← All recipes</button>
 
       ${
         r.image
@@ -449,6 +474,7 @@ function beep() {
 document.addEventListener("click", (e) => {
   const openBtn = e.target.closest("[data-open]");
   if (openBtn) {
+    state.listScroll = window.scrollY;
     location.hash = "#/" + openBtn.getAttribute("data-open");
     return;
   }
@@ -458,6 +484,19 @@ document.addEventListener("click", (e) => {
   if (tabBtn) {
     const val = tabBtn.getAttribute("data-tab");
     state.category = val === "All" ? null : val;
+    renderList();
+    // If the page is scrolled past the top of the results, bring them back under the sticky bar.
+    const nav = app.querySelector(".navbar"), res = document.getElementById("results");
+    if (nav && res) {
+      const gap = res.getBoundingClientRect().top - nav.offsetHeight - 8;
+      if (gap < 0) window.scrollTo({ top: window.scrollY + gap });
+    }
+    return;
+  }
+
+  if (e.target.closest("[data-clear]")) {
+    state.query = "";
+    state.category = null;
     renderList();
     return;
   }
@@ -532,7 +571,7 @@ function syncFromHash() {
     document.title = "My Cookbook";
   }
   render();
-  window.scrollTo(0, 0);
+  window.scrollTo(0, r ? 0 : state.listScroll || 0);
 }
 
 window.addEventListener("hashchange", syncFromHash);
