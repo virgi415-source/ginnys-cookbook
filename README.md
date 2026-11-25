@@ -61,3 +61,11 @@ Build command: *none*. Publish directory: `.` (the repo root).
 
 To deploy manually instead, drop this folder on
 https://app.netlify.com/projects/ginnys-cookbook-recipes/deploys
+
+## Cooking-mode timers
+
+- The countdown runs off a fixed end time, so it stays correct while the page is in the background and catches up when you return. If the page is reloaded mid-recipe, cooking mode resumes where it was (kept for 8 hours).
+- The screen stays awake while cooking mode is open (where the browser supports it).
+- **Send to phone timer** (touch devices): starts a real timer in the phone's Clock app so it rings even if the page is closed.
+  - **iPhone:** needs a one-time Shortcut named `Recipe Timer`: add **Get Numbers from Input** (input: Shortcut Input), then **Start Timer** with that number as the time and the unit set to seconds. The button runs it through a `shortcuts://` link and returns to the recipe.
+  - **Android (Chrome):** uses the standard set-timer intent; no setup.

@@ -415,6 +415,20 @@ function renderCooking(r) {
                  <button class="timer-btn" data-timer ${c.secondsLeft === 0 ? "disabled" : ""}>
                    ${c.secondsLeft === 0 ? "Time's up" : c.running ? "Pause timer" : "Start timer"}
                  </button>
+                 ${
+                   TOUCH && c.secondsLeft > 0
+                     ? `<button class="timer-btn timer-alt" data-phone-timer>${c.phoneTimer ? "Sent to phone timer ✓ (tap to resend)" : "Send to phone timer"}</button>
+                        <p class="phone-note">Starts a timer in your Clock app, so it still rings if you leave this page.</p>
+                        ${IOS_LIKE ? `<details class="phone-help"><summary>One-time iPhone setup</summary>
+                          <ol>
+                            <li>Open the <b>Shortcuts</b> app and tap <b>+</b>.</li>
+                            <li>Name it exactly <b>${esc(PHONE_TIMER_SHORTCUT)}</b>.</li>
+                            <li>Add <b>Get Numbers from Input</b> (input: Shortcut Input).</li>
+                            <li>Add <b>Start Timer</b>. Set its time to the <b>Numbers</b> result and the unit to <b>seconds</b>.</li>
+                            <li>Back here, tap the button and allow the prompts the first time.</li>
+                          </ol></details>` : ""}`
+                     : ""
+                 }
                </div>`
             : ""
         }
@@ -438,33 +452,141 @@ function render() {
   else renderList();
   renderCooking(r);
   document.body.style.overflow = state.cooking ? "hidden" : "";
+  if (state.cooking) { saveCooking(); holdScreen(); } else releaseScreen();
 }
 
-/* ---------- Timer ---------- */
+/* ---------- Timer ----------
+   The countdown is based on a fixed end time (c.endAt), not on counting ticks, so it stays
+   correct while the page is in the background and catches up the moment you come back. */
+const TOUCH = !!(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
+const IOS_LIKE = /iPhone|iPad|iPod|Macintosh/i.test(navigator.userAgent) && !/Android/i.test(navigator.userAgent);
+const PHONE_TIMER_SHORTCUT = "Recipe Timer"; // name of the Shortcut on iPhone (see the setup steps in cooking mode)
+const COOKING_KEY = "ginnys-cooking";
+
+function remainingSeconds(c) {
+  return Math.max(0, Math.ceil((c.endAt - Date.now()) / 1000));
+}
+
 function stopTick() {
   if (tick) { clearInterval(tick); tick = null; }
 }
 
+function syncTimer() {
+  const c = state.cooking;
+  if (!c || !c.running) return stopTick();
+  const left = remainingSeconds(c);
+  const finished = left === 0;
+  if (left === c.secondsLeft && !finished) return;
+  c.secondsLeft = left;
+  if (finished) {
+    c.running = false;
+    c.endAt = null;
+    stopTick();
+    if (!c.phoneTimer) alarm(); // the phone's own timer rings when one was sent
+  }
+  render();
+}
+
 function startTick() {
   stopTick();
-  tick = setInterval(() => {
+  tick = setInterval(syncTimer, 500);
+}
+
+function openExternal(url) { window.location.href = url; }
+
+function phoneTimerUrl(seconds, label) {
+  if (/Android/i.test(navigator.userAgent)) {
+    return "intent:#Intent;action=android.intent.action.SET_TIMER;i.android.intent.extra.alarm.LENGTH=" + seconds +
+      ";S.android.intent.extra.alarm.MESSAGE=" + encodeURIComponent(label) + ";B.android.intent.extra.alarm.SKIP_UI=true;end";
+  }
+  const back = encodeURIComponent(location.href);
+  return "shortcuts://x-callback-url/run-shortcut?name=" + encodeURIComponent(PHONE_TIMER_SHORTCUT) +
+    "&input=text&text=" + seconds + "&x-success=" + back + "&x-cancel=" + back + "&x-error=" + back;
+}
+
+/* Keep the screen awake while cooking mode is open. */
+let wakeLock = null, wakeBusy = false;
+async function holdScreen() {
+  try {
+    if (!state.cooking || wakeLock || wakeBusy || !navigator.wakeLock || document.visibilityState !== "visible") return;
+    wakeBusy = true;
+    wakeLock = await navigator.wakeLock.request("screen");
+    wakeLock.addEventListener("release", () => { wakeLock = null; });
+  } catch (e) { /* not supported, or denied */ }
+  wakeBusy = false;
+}
+function releaseScreen() {
+  try { if (wakeLock) wakeLock.release(); } catch (e) { /* ignore */ }
+  wakeLock = null;
+}
+
+/* Remember cooking mode so a reload (iOS often discards background tabs) picks up where you left off. */
+function saveCooking() {
+  try {
     const c = state.cooking;
-    if (!c || !c.running) return stopTick();
-    c.secondsLeft = Math.max(0, c.secondsLeft - 1);
-    if (c.secondsLeft === 0) {
-      c.running = false;
-      stopTick();
-      beep();
+    if (!c) return;
+    localStorage.setItem(COOKING_KEY, JSON.stringify({
+      recipeId: state.openId, stepIndex: c.stepIndex, secondsLeft: c.secondsLeft,
+      running: c.running, endAt: c.endAt, phoneTimer: !!c.phoneTimer, savedAt: Date.now(),
+    }));
+  } catch (e) { /* storage unavailable */ }
+}
+function clearCooking() {
+  try { localStorage.removeItem(COOKING_KEY); } catch (e) { /* ignore */ }
+}
+function restoreCooking(r) {
+  try {
+    const saved = JSON.parse(localStorage.getItem(COOKING_KEY) || "null");
+    if (!saved || saved.recipeId !== r.id || Date.now() - saved.savedAt > 8 * 3600 * 1000) return;
+    if (!(saved.stepIndex >= 0 && saved.stepIndex < r.steps.length)) return;
+    const c = {
+      stepIndex: saved.stepIndex, secondsLeft: saved.secondsLeft, running: !!saved.running,
+      endAt: saved.endAt || null, phoneTimer: !!saved.phoneTimer,
+    };
+    if (c.running && c.endAt) {
+      c.secondsLeft = remainingSeconds(c);
+      if (c.secondsLeft === 0) { c.running = false; c.endAt = null; }
+    } else {
+      c.running = false; c.endAt = null;
     }
-    render();
-  }, 1000);
+    state.cooking = c;
+    if (c.running) startTick();
+  } catch (e) { /* ignore a corrupt save */ }
+}
+
+/* Coming back to the page: catch the timer up straight away and re-hold the screen. */
+function resumeFromBackground() {
+  if (document.visibilityState && document.visibilityState !== "visible") return;
+  if (!state.cooking) return;
+  if (state.cooking.running) { startTick(); syncTimer(); }
+  holdScreen();
+}
+document.addEventListener("visibilitychange", resumeFromBackground);
+window.addEventListener("pageshow", resumeFromBackground);
+
+/* One AudioContext, created on a tap so iOS lets it make sound later. */
+let audioCtx = null;
+function unlockAudio() {
+  try {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return;
+    if (!audioCtx) audioCtx = new Ctx();
+    if (audioCtx.state === "suspended") audioCtx.resume();
+  } catch (e) { /* audio not available */ }
+}
+
+function alarm() {
+  beep();
+  setTimeout(beep, 1100);
+  setTimeout(beep, 2200);
+  try { if (navigator.vibrate) navigator.vibrate([400, 200, 400, 200, 400]); } catch (e) { /* ignore */ }
 }
 
 function beep() {
   try {
     const Ctx = window.AudioContext || window.webkitAudioContext;
     if (!Ctx) return;
-    const ctx = new Ctx();
+    const ctx = audioCtx || new Ctx();
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.connect(gain); gain.connect(ctx.destination);
@@ -538,13 +660,14 @@ document.addEventListener("click", (e) => {
 
   if (e.target.closest("[data-cook]")) {
     const r = findRecipe(state.openId);
-    state.cooking = { stepIndex: 0, secondsLeft: r.steps[0].timer, running: false };
+    state.cooking = { stepIndex: 0, secondsLeft: r.steps[0].timer, running: false, endAt: null, phoneTimer: false };
     render();
     return;
   }
   if (e.target.closest("[data-exit]")) {
     stopTick();
     state.cooking = null;
+    clearCooking();
     render();
     return;
   }
@@ -553,9 +676,34 @@ document.addEventListener("click", (e) => {
 
   if (e.target.closest("[data-timer]")) {
     const c = state.cooking;
-    c.running = !c.running;
-    if (c.running) startTick(); else stopTick();
+    if (c.running) {
+      c.secondsLeft = remainingSeconds(c); // pause: keep what's left
+      c.running = false;
+      c.endAt = null;
+      stopTick();
+    } else {
+      unlockAudio();
+      c.endAt = Date.now() + c.secondsLeft * 1000;
+      c.running = true;
+      startTick();
+    }
     render();
+    return;
+  }
+
+  if (e.target.closest("[data-phone-timer]")) {
+    const c = state.cooking;
+    const r = findRecipe(state.openId);
+    const secs = c.running ? remainingSeconds(c) : c.secondsLeft;
+    if (!secs) return;
+    if (!c.running) { // run the on-page countdown too, so you can see it
+      c.endAt = Date.now() + secs * 1000;
+      c.running = true;
+      startTick();
+    }
+    c.phoneTimer = true; // the phone rings, so the page stays quiet
+    render();
+    openExternal(phoneTimerUrl(secs, r.steps[c.stepIndex].title));
     return;
   }
 });
@@ -569,22 +717,26 @@ function moveStep(delta) {
   c.stepIndex = next;
   c.secondsLeft = r.steps[next].timer;
   c.running = false;
+  c.endAt = null;
+  c.phoneTimer = false;
   render();
 }
 
 document.addEventListener("keydown", (e) => {
   if (!state.cooking) return;
-  if (e.key === "Escape") { stopTick(); state.cooking = null; render(); }
+  if (e.key === "Escape") { stopTick(); state.cooking = null; clearCooking(); render(); }
   if (e.key === "ArrowRight") moveStep(1);
   if (e.key === "ArrowLeft") moveStep(-1);
 });
 
 /* ---------- Routing ---------- */
+let firstRoute = true;
 function syncFromHash() {
   const id = decodeURIComponent(location.hash.replace(/^#\/?/, ""));
   const r = id ? findRecipe(id) : null;
   stopTick();
   state.cooking = null;
+  if (!firstRoute) clearCooking();
   if (r) {
     state.openId = r.id;
     state.servings = r.scalable === false ? r.baseServings : (r.defaultServings || 1);
@@ -594,6 +746,8 @@ function syncFromHash() {
     state.servings = null;
     document.title = "My Cookbook";
   }
+  if (firstRoute && r) restoreCooking(r); // reloaded mid-recipe: pick cooking mode back up
+  firstRoute = false;
   render();
   window.scrollTo(0, r ? 0 : state.listScroll || 0);
 }
