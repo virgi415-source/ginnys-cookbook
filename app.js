@@ -140,6 +140,7 @@ function humanTime(s) {
 
 /* ---------- App state ---------- */
 const state = {
+  catOpen: false,
   openId: null,
   servings: null,
   query: "",
@@ -237,7 +238,11 @@ function renderList() {
                value="${esc(state.query)}" aria-label="Search recipes"
                enterkeyhint="search" autocomplete="off" autocapitalize="off" />
       </div>
-      <div class="tabs" role="group" aria-label="Recipe categories">${tabs}</div>
+      <button class="cat-toggle" type="button" data-cat-toggle aria-expanded="${state.catOpen ? "true" : "false"}" aria-controls="cat-panel">
+        <span class="cat-toggle-label">Category: <strong>${esc(state.category || "All recipes")}</strong></span>
+        <svg class="cat-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="tabs${state.catOpen ? " open" : ""}" id="cat-panel" role="group" aria-label="Recipe categories">${tabs}</div>
     </div>
     <div class="count">${matches.length} of ${RECIPES.length} recipe${RECIPES.length === 1 ? "" : "s"}</div>
 
@@ -475,15 +480,34 @@ document.addEventListener("click", (e) => {
   const openBtn = e.target.closest("[data-open]");
   if (openBtn) {
     state.listScroll = window.scrollY;
+    state.catOpen = false;
     location.hash = "#/" + openBtn.getAttribute("data-open");
     return;
   }
   if (e.target.closest("[data-back]")) { location.hash = ""; return; }
 
+  const catToggle = e.target.closest("[data-cat-toggle]");
+  if (catToggle) {
+    state.catOpen = !state.catOpen;
+    catToggle.setAttribute("aria-expanded", state.catOpen ? "true" : "false");
+    const panel = document.getElementById("cat-panel");
+    if (panel) panel.classList.toggle("open", state.catOpen);
+    return;
+  }
+  if (state.catOpen && !e.target.closest(".tabs")) {
+    // tapping anywhere else closes the category panel
+    state.catOpen = false;
+    const panel = document.getElementById("cat-panel");
+    if (panel) panel.classList.remove("open");
+    const t = document.querySelector("[data-cat-toggle]");
+    if (t) t.setAttribute("aria-expanded", "false");
+  }
+
   const tabBtn = e.target.closest("[data-tab]");
   if (tabBtn) {
     const val = tabBtn.getAttribute("data-tab");
     state.category = val === "All" ? null : val;
+    state.catOpen = false;
     renderList();
     // If the page is scrolled past the top of the results, bring them back under the sticky bar.
     const nav = app.querySelector(".navbar"), res = document.getElementById("results");
@@ -563,7 +587,7 @@ function syncFromHash() {
   state.cooking = null;
   if (r) {
     state.openId = r.id;
-    state.servings = r.scalable === false ? r.baseServings : 1;
+    state.servings = r.scalable === false ? r.baseServings : (r.defaultServings || 1);
     document.title = r.title + " — My Cookbook";
   } else {
     state.openId = null;
