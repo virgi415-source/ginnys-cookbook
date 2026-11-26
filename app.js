@@ -91,6 +91,9 @@ const UNIT_STEPS = {
 // express the amount and a smaller one should be tried.
 function formatNiceFraction(val) {
   if (Math.abs(val - Math.round(val)) < 0.01) return String(Math.round(val));
+  // thirds (⅓ cup etc.) read better than the nearest eighth
+  const third = Math.abs(val - Math.floor(val) - 1 / 3) < 0.02 ? "⅓" : Math.abs(val - Math.floor(val) - 2 / 3) < 0.02 ? "⅔" : null;
+  if (third) return Math.floor(val) > 0 ? `${Math.floor(val)}${third}` : third;
   const rounded = Math.round(val * 8) / 8;
   if (rounded === 0) return null;
   if (Number.isInteger(rounded)) return String(rounded);
@@ -292,6 +295,20 @@ function timesHtml(r) {
   return parts.length ? `<p class="times">${esc(parts.join(" · "))}</p>` : "";
 }
 
+/* Step text can hold amount tokens: {i3} is ingredient i3's amount at the current servings
+   (e.g. "270 g"), and {i3*0.5} is half of it. They keep the steps in step with the servings stepper. */
+function stepText(r, content) {
+  return content.replace(/\{(i\d+)(?:\*([\d.]+))?\}/g, (m, id, mult) => {
+    const ing = r.ingredients.find((i) => i.id === id);
+    if (!ing) return m;
+    const servings = state.servings || r.baseServings;
+    const q = scaleQuantity(ing.amount * (mult ? parseFloat(mult) : 1), r.baseServings, servings, ing.unit);
+    const val = (ing.amount * (mult ? parseFloat(mult) : 1) / r.baseServings) * servings;
+    const unit = q.unit === "cup" && val > 1.01 ? "cups" : q.unit || "";
+    return `${q.text} ${unit}`.trim();
+  });
+}
+
 function renderDetail(r) {
   const servings = state.servings;
   const isVideoSource = r.sourceUrl && /youtu\.?be/i.test(r.sourceUrl);
@@ -314,7 +331,7 @@ function renderDetail(r) {
           <span class="step-title" style="display:block">${esc(s.title)}${
             s.timer != null ? `<span class="step-time"> · ${humanTime(s.timer)}</span>` : ""
           }</span>
-          <span class="step-body" style="display:block">${esc(s.content)}</span>
+          <span class="step-body" style="display:block">${esc(stepText(r, s.content))}</span>
         </span>
       </li>`
     )
@@ -407,7 +424,7 @@ function renderCooking(r) {
       <div class="cooking-body">
         <div class="step-counter">STEP ${c.stepIndex + 1} OF ${r.steps.length}</div>
         <h2 class="cooking-title">${esc(step.title)}</h2>
-        <p class="cooking-text">${esc(step.content)}</p>
+        <p class="cooking-text">${esc(stepText(r, step.content))}</p>
         ${
           step.timer != null
             ? `<div class="timer-wrap">
